@@ -102,6 +102,51 @@ Obviously there could be many diffeent types of schedulers you could
 pick an choose from. You could also implement your own scheduler (I
 would imagine) very easily.
 
+
+
+## Advantages?
+So, what would the real advantage be? If we're talking about
+continuously running processes or things that run on a timer, then I'm
+not sure there is too much of an advantage to that. The equivalent EM
+code would be really simple as well. I see there being two main
+advantages:
+
++ Throttling/Scaling Scheduler
++ Running in _Standalone_ mode
+
+
+### Throtting/Scaling Scheduler
+
+### Standalone Mode
+I imagine standalone mode would just be some way to run it without having
+to include EM explicitely such like:
+
+```ruby
+# File my_worker.rb
+class MyWorker < EM::Worker
+  set_scheduler :continuous
+  
+  def do_work
+    # ... some task ...
+  end
+end
+```
+
+And you could start it like:
+```bash
+# start it with a provided binary
+worker my_worker.rb
+```
+
+Or you could start it in Ruby like:
+```ruby
+# main.rb (or something)
+require './my_worker'
+
+MyWorker.standalone!
+```
+
+
 ## Suggestions?
 
 Tell me what you think: me@johnmurray.io
