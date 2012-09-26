@@ -1,66 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>EM-Worker by JohnMurray</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="EM-Worker : Worker framework using EventMachine" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>EM-Worker</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>EM-Worker</h1>
-        <p>Worker framework using EventMachine</p>
 
-        <p class="view"><a href="https://github.com/JohnMurray/em-worker">View the Project on GitHub <small>JohnMurray/em-worker</small></a></p>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/JohnMurray/em-worker">View on GitHub</a>
 
+          <h1 id="project_title">EM-Worker</h1>
+          <h2 id="project_tagline">Worker framework using EventMachine</h2>
 
-        <ul>
-          <li><a href="https://github.com/JohnMurray/em-worker/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/JohnMurray/em-worker/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/JohnMurray/em-worker">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>Welcome to GitHub Pages.</h3>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/JohnMurray/em-worker/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/JohnMurray/em-worker/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>So right now, this is really all just an idea that I'm trying to
+think through and see if it's really worth it or not. So, here's
+what I got.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+<h2>Problem</h2>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>You need to run some type of task over and over again (let's assume
+continuously w/o stop). How do you go about doing it? If it sits
+behind a queue then you're in luck. There are many queue processing
+libraries out there. However, let's assume that you're not sitting behind
+a queue and you're not using a queue processing library. How would you
+go about solving the problem?</p>
 
-<h3>Designer Templates</h3>
+<p>For the sake of demonstration, let's use the following problem:</p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<div class="highlight"><pre>You are creating a new social network (that's just what the world
+needs) and you want to create an activity stream. To solve the problem
+of sharing, you've implemented a model such that your items are pushed
+into the stream in an "unpublished" state. 
 
-<h3>Rather Drive Stick?</h3>
+You then have a process which will (periodically) collect all unpublished
+items and push them to the user's friends' streams (based on said user's
+privacy settings). That's really not that bad of a model to be honest
+(seems to be how etsy does it).
+</pre></div>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>How do you implement this process? Cron tasks? If so, how would you
+deploy this on something like Heroku? Would you use their cron plugin?
+If so, then you're really limiting yourself to scaling up to aggregate/
+process more data. </p>
 
-<h3>Authors and Contributors</h3>
+<h2>Solution</h2>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>I think a valid option is to use a framework like EventMachine where you
+can schedule tasks to be run (on a timer, the next tick, etc.) and you
+don't have to rely on any type of cron. There are lots of projects that
+use this model.</p>
 
-<h3>Support or Contact</h3>
+<h2>A Better Solution</h2>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Given that I feel like this is a common problem, shouldn't someone make
+something that makes all of this a little easier (for EM)? That's what
+I am talking about! How can we go about making a framework for writing
+"workers" that uses eventmachine and extracts all of the nasty
+setup/implementation details that go along with creating a service like
+this in EventMachine?</p>
+
+<h2>An Idea</h2>
+
+<p>A library (gem) that extracts the running and scheduling of the worker
+processes. It would basically be a single class that looked something
+like:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyWorker</span> <span class="o">&lt;</span> <span class="no">EM</span><span class="o">::</span><span class="no">Worker</span>
+  <span class="k">def</span> <span class="nf">do_work</span>
+    <span class="c1"># gets called continuously</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>There is just one method that executes and then is scheduled to run
+again. There could also be some type of scheduler that determines
+when a worker should be run. The default scheduler that runs something
+continuously might look like:</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">EM</span><span class="o">::</span><span class="no">WorkerScheduler</span>
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">workers</span><span class="p">)</span>
+    <span class="vi">@workers</span> <span class="o">=</span> <span class="n">workers</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">run</span>
+    <span class="vi">@workers</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">worker</span><span class="o">|</span>
+      <span class="no">EM</span><span class="o">.</span><span class="n">next_tick</span> <span class="k">do</span>
+        <span class="n">worker</span><span class="o">.</span><span class="n">run!</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">EM</span><span class="o">::</span><span class="no">Worker</span>
+  <span class="k">def</span> <span class="nf">run!</span>
+    <span class="n">do_work</span>
+    <span class="no">EM</span><span class="o">.</span><span class="n">next_tick</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">method</span><span class="p">(</span><span class="ss">:do_work</span><span class="p">))</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>I'm sure there's something wrong here that doesn't work but you 
+get the point. The scheduler starts a worker task and that worker
+then performs it's work and runs the <code>do_work</code> method and schedules
+itself again for the next available tick. </p>
+
+<p>Obviously there could be many diffeent types of schedulers you could
+pick an choose from. You could also implement your own scheduler (I
+would imagine) very easily.</p>
+
+<h2>Advantages?</h2>
+
+<p>So, what would the real advantage be? If we're talking about
+continuously running processes or things that run on a timer, then I'm
+not sure there is too much of an advantage to that. The equivalent EM
+code would be really simple as well. I see there being two main
+advantages:</p>
+
+<ul>
+<li>Throttling/Scaling Scheduler</li>
+<li>Running in <em>Standalone</em> mode</li>
+</ul><h3>Throtting/Scaling Scheduler</h3>
+
+<h3>Standalone Mode</h3>
+
+<p>I imagine standalone mode would just be some way to run it without having
+to include EM explicitely such like:</p>
+
+<div class="highlight"><pre><span class="c1"># File my_worker.rb</span>
+<span class="k">class</span> <span class="nc">MyWorker</span> <span class="o">&lt;</span> <span class="no">EM</span><span class="o">::</span><span class="no">Worker</span>
+  <span class="n">set_scheduler</span> <span class="ss">:continuous</span>
+
+  <span class="k">def</span> <span class="nf">do_work</span>
+    <span class="c1"># ... some task ...</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>And you could start it like:</p>
+
+<div class="highlight"><pre><span class="c"># start it with a provided binary</span>
+worker my_worker.rb
+</pre></div>
+
+<p>Or you could start it in Ruby like:</p>
+
+<div class="highlight"><pre><span class="c1"># main.rb (or something)</span>
+<span class="nb">require</span> <span class="s1">'./my_worker'</span>
+
+<span class="no">MyWorker</span><span class="o">.</span><span class="n">standalone!</span>
+</pre></div>
+
+<h2>Suggestions?</h2>
+
+<p>Tell me what you think: <a href="mailto:me@johnmurray.io">me@johnmurray.io</a></p>
       </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/JohnMurray">JohnMurray</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">EM-Worker maintained by <a href="https://github.com/JohnMurray">JohnMurray</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+
     
+
   </body>
 </html>
